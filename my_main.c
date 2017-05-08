@@ -56,12 +56,28 @@ void my_main() {
   struct stack *s;
   screen t;
   color g;
+  FILE *f = fopen("script.mdl","r");
+  char line[255];
   
   s = new_stack();
   tmp = new_matrix(4, 1000);
   clear_screen( t );
 
-  for (i=0;i<lastop;i++) {  
+  for (i=0;i<lastop;i++) { 
+
+    line[strlen(line)-1]='\0';
+    //printf(":%s:\n",line);
+
+    double xvals[4];
+    double yvals[4];
+    double zvals[4];
+    //struct matrix *tmp;
+    double r, r1;
+    double theta;
+    char axis;
+    int type;
+    double step = 0.1;
+ 
     switch (op[i].opcode) {
     case PUSH:
       push(s);
@@ -70,33 +86,35 @@ void my_main() {
       pop(s);
       break;
     case MOVE:
-      /*reference
+      //*reference
 	fgets(line, sizeof(line), f);
       //printf("MOVE\t%s", line);
       sscanf(line, "%lf %lf %lf",
 	     xvals, yvals, zvals);
       //printf("%lf %lf %lf\n", 
       // 	xvals[0], yvals[0], zvals[0]);
-      tmp = make_translate( xvals[0], yvals[0], zvals[0]);
-      matrix_mult(peek(systems), tmp);
-      copy_matrix(tmp, peek(systems));
-       */
+      //tmp = make_translate( xvals[0], yvals[0], zvals[0]);
+      //matrix_mult(peek(systems), tmp);
+      //copy_matrix(tmp, peek(systems));
+      move(xvals[0],yvals[0],zvals[0]);
+      //*/
       break;
     case SCALE:
-      /*reference 
+      //*reference 
 	fgets(line, sizeof(line), f);
       //printf("SCALE\t%s", line);
       sscanf(line, "%lf %lf %lf",
 	     xvals, yvals, zvals);
       // printf("%lf %lf %lf\n", 
       // 	xvals[0], yvals[0], zvals[0]); 
-      tmp = make_scale( xvals[0], yvals[0], zvals[0]);      
-      matrix_mult(peek(systems), tmp);
-      copy_matrix(tmp, peek(systems));
-       */
+      //tmp = make_scale( xvals[0], yvals[0], zvals[0]);      
+      //matrix_mult(peek(systems), tmp);
+      //copy_matrix(tmp, peek(systems));
+      scale(xvals[0],yvals[0],zvals[0]);
+      //*/
       break;
     case ROTATE:
-      /*reference
+      //*reference
 	fgets(line, sizeof(line), f);
       //printf("Rotate\t%s", line);
       sscanf(line, "%c %lf",
@@ -104,60 +122,64 @@ void my_main() {
       // printf("%c %lf\n", 
       // 	axis, theta); 
       theta = theta * (M_PI / 180);
-      if ( axis == 'x' )
-	tmp = make_rotX( theta );
-      else if ( axis == 'y' )
-	tmp = make_rotY( theta );
-      else 
-	tmp = make_rotZ( theta );
-      matrix_mult(peek(systems), tmp);
-      copy_matrix(tmp, peek(systems));
-       */
+      //if ( axis == 'x' )
+	//tmp = make_rotX( theta );
+      //else if ( axis == 'y' )
+      //tmp = make_rotY( theta );
+      //else 
+      //tmp = make_rotZ( theta );
+      //matrix_mult(peek(systems), tmp);
+      //copy_matrix(tmp, peek(systems));
+      rotate(axis,theta);
+      // */
       break;
     case BOX:
-      /*reference
+      //*reference
 fgets(line, sizeof(line), f);
       //printf("BOX\t%s", line);
 
       sscanf(line, "%lf %lf %lf %lf %lf %lf",
 	     xvals, yvals, zvals,
 	     xvals+1, yvals+1, zvals+1);
-      add_box(edges, xvals[0], yvals[0], zvals[0],
-	      xvals[1], yvals[1], zvals[1]);
+      //add_box(edges, xvals[0], yvals[0], zvals[0],
+      //xvals[1], yvals[1], zvals[1]);
 
-      matrix_mult(peek(systems), edges);
-      draw_polygons(edges, s, c);
-      edges->lastcol = 0;
-      */
+      //matrix_mult(peek(systems), edges);
+      //draw_polygons(edges, s, c);
+      //edges->lastcol = 0;
+      box(xvals[0],yvals[0],zvals[0],xvals[1],yvals[1],zvals[1]);
+      //*/
       break;
     case SPHERE:
-      /*reference
+      //*reference
 fgets(line, sizeof(line), f);
       //printf("SPHERE\t%s", line);
 
       sscanf(line, "%lf %lf %lf %lf",
 	     xvals, yvals, zvals, &r);
-      add_sphere( edges, xvals[0], yvals[0], zvals[0], r, step);
-      matrix_mult(peek(systems), edges);
-      draw_polygons(edges, s, c);
-      edges->lastcol = 0;
-      */
+      //add_sphere( edges, xvals[0], yvals[0], zvals[0], r, step);
+      //matrix_mult(peek(systems), edges);
+      //draw_polygons(edges, s, c);
+      //edges->lastcol = 0;
+      sphere(xvals[0],yvals[0],zvals[0],r);
+      //*/
       break;
     case TORUS:
-      /*reference
+      //*reference
 fgets(line, sizeof(line), f);
       //printf("torus\t%s", line);
 
       sscanf(line, "%lf %lf %lf %lf %lf",
 	     xvals, yvals, zvals, &r, &r1);
-      add_torus( edges, xvals[0], yvals[0], zvals[0], r, r1, step);
-      matrix_mult(peek(systems), edges);
-      draw_polygons(edges, s, c);
-      edges->lastcol = 0;
-      */
+      //add_torus( edges, xvals[0], yvals[0], zvals[0], r, r1, step);
+      //matrix_mult(peek(systems), edges);
+      //draw_polygons(edges, s, c);
+      //edges->lastcol = 0;
+      torus(xvals[0],yvals[0],zvals[0],r,r1);
+      //*/
       break;
     case LINE:
-      /*reference
+      //*reference
 fgets(line, sizeof(line), f);
       //printf("LINE\t%s", line);
 
@@ -165,22 +187,24 @@ fgets(line, sizeof(line), f);
 	     xvals, yvals, zvals,
 	     xvals+1, yvals+1, zvals+1);
       //printf("%lf %lf %lf %lf %lf %lf",
-	     xvals[0], yvals[0], zvals[0],
-	     xvals[1], yvals[1], zvals[1]) 
-      add_edge(edges, xvals[0], yvals[0], zvals[0],
-	       xvals[1], yvals[1], zvals[1]); 
-*/
+      //xvals[0], yvals[0], zvals[0],
+      //	     xvals[1], yvals[1], zvals[1]) 
+      //add_edge(edges, xvals[0], yvals[0], zvals[0],
+      //	       xvals[1], yvals[1], zvals[1]); 
+      line(xvals[0],yvals[0],zvals[0],xvals[1],yvals[1],zvals[1]);
+      //*/
       break;
     case SAVE:
-      /*reference
+      //*reference
 fgets(line, sizeof(line), f);
       *strchr(line, '\n') = 0;
       //printf("SAVE\t%s\n", line);
-      save_extension(s, line);
-      */
+      //save_extension(s, line);
+      save(line);
+      //*/
       break;
     case DISPLAY:
-      display(s);
+      display(t);
       break;
 
       /*push: push a new origin matrix onto the origin stack
