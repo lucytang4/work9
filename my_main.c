@@ -56,28 +56,13 @@ void my_main() {
   struct stack *s;
   screen t;
   color g;
-  FILE *f = fopen("script.mdl","r");
-  char line[255];
+  double step = 0.01;
   
   s = new_stack();
   tmp = new_matrix(4, 1000);
   clear_screen( t );
 
   for (i=0;i<lastop;i++) { 
-
-    line[strlen(line)-1]='\0';
-    //printf(":%s:\n",line);
-
-    double xvals[4];
-    double yvals[4];
-    double zvals[4];
-    //struct matrix *tmp;
-    double r, r1;
-    double theta;
-    char axis;
-    int type;
-    double step = 0.1;
- 
     switch (op[i].opcode) {
     case PUSH:
       push(s);
@@ -86,148 +71,59 @@ void my_main() {
       pop(s);
       break;
     case MOVE:
-      //*reference
-	fgets(line, sizeof(line), f);
-      //printf("MOVE\t%s", line);
-      sscanf(line, "%lf %lf %lf",
-	     xvals, yvals, zvals);
-      //printf("%lf %lf %lf\n", 
-      // 	xvals[0], yvals[0], zvals[0]);
-      //tmp = make_translate( xvals[0], yvals[0], zvals[0]);
-      //matrix_mult(peek(systems), tmp);
-      //copy_matrix(tmp, peek(systems));
-      move(xvals[0],yvals[0],zvals[0]);
-      //*/
+      tmp = make_translate(op[i].op.move.d[0], op[i].op.move.d[1],
+			   op[i].op.move.d[2]);
+      matrix_mult(peek(s), tmp);
+      copy_matrix(tmp, peek(s));
       break;
     case SCALE:
-      //*reference 
-	fgets(line, sizeof(line), f);
-      //printf("SCALE\t%s", line);
-      sscanf(line, "%lf %lf %lf",
-	     xvals, yvals, zvals);
-      // printf("%lf %lf %lf\n", 
-      // 	xvals[0], yvals[0], zvals[0]); 
-      //tmp = make_scale( xvals[0], yvals[0], zvals[0]);      
-      //matrix_mult(peek(systems), tmp);
-      //copy_matrix(tmp, peek(systems));
-      scale(xvals[0],yvals[0],zvals[0]);
-      //*/
+      tmp = make_scale(op[i].op.scale.d[0], op[i].op.scale.d[1],
+			   op[i].op.scale.d[2]);      
+      matrix_mult(peek(s), tmp);
+      copy_matrix(tmp, peek(s));
       break;
     case ROTATE:
-      //*reference
-	fgets(line, sizeof(line), f);
-      //printf("Rotate\t%s", line);
-      sscanf(line, "%c %lf",
-	     &axis, &theta);      
-      // printf("%c %lf\n", 
-      // 	axis, theta); 
-      theta = theta * (M_PI / 180);
-      //if ( axis == 'x' )
-	//tmp = make_rotX( theta );
-      //else if ( axis == 'y' )
-      //tmp = make_rotY( theta );
-      //else 
-      //tmp = make_rotZ( theta );
-      //matrix_mult(peek(systems), tmp);
-      //copy_matrix(tmp, peek(systems));
-      rotate(axis,theta);
-      // */
+      double theta = op[i].op.rotate.degrees * (M_PI / 180);
+      if (op[i].op.rotate.axis == 0 )
+	tmp = make_rotX( theta );
+      else if (op[i].op.rotate.axis == 1)
+	tmp = make_rotY( theta );
+      else if (op[i].op.rotate.axis == 2)
+	tmp = make_rotZ( theta );
+      matrix_mult(peek(s), tmp);
+      copy_matrix(tmp, peek(s));
       break;
     case BOX:
-      //*reference
-fgets(line, sizeof(line), f);
-      //printf("BOX\t%s", line);
-
-      sscanf(line, "%lf %lf %lf %lf %lf %lf",
-	     xvals, yvals, zvals,
-	     xvals+1, yvals+1, zvals+1);
-      //add_box(edges, xvals[0], yvals[0], zvals[0],
-      //xvals[1], yvals[1], zvals[1]);
-
-      //matrix_mult(peek(systems), edges);
-      //draw_polygons(edges, s, c);
-      //edges->lastcol = 0;
-      box(xvals[0],yvals[0],zvals[0],xvals[1],yvals[1],zvals[1]);
-      //*/
+      add_box(tmp, op[i].op.box.d0[0], op[i].op.box.d0[1],
+	      op[i].op.box.d0[2], op[i].op.box.d1[0],
+	      op[i].op.box.d1[1], op[i].op.box.d1[2]);
+      matrix_mult(peek(s), tmp);
+      draw_polygons(tmp, t, g);
       break;
     case SPHERE:
-      //*reference
-fgets(line, sizeof(line), f);
-      //printf("SPHERE\t%s", line);
-
-      sscanf(line, "%lf %lf %lf %lf",
-	     xvals, yvals, zvals, &r);
-      //add_sphere( edges, xvals[0], yvals[0], zvals[0], r, step);
-      //matrix_mult(peek(systems), edges);
-      //draw_polygons(edges, s, c);
-      //edges->lastcol = 0;
-      sphere(xvals[0],yvals[0],zvals[0],r);
-      //*/
+      add_sphere(tmp, op[i].op.sphere.d[0], op[i].op.sphere.d[1],
+		 op[i].op.sphere.d[2], op[i].op.sphere.r, step);
+      matrix_mult(peek(s), tmp);
+      draw_polygons(tmp, t, g);
       break;
     case TORUS:
-      //*reference
-fgets(line, sizeof(line), f);
-      //printf("torus\t%s", line);
-
-      sscanf(line, "%lf %lf %lf %lf %lf",
-	     xvals, yvals, zvals, &r, &r1);
-      //add_torus( edges, xvals[0], yvals[0], zvals[0], r, r1, step);
-      //matrix_mult(peek(systems), edges);
-      //draw_polygons(edges, s, c);
-      //edges->lastcol = 0;
-      torus(xvals[0],yvals[0],zvals[0],r,r1);
-      //*/
+      add_torus(tmp, op[i].op.torus.d[0], op[i].op.toruse.d[1],
+		op[i].op.torus.d[2], op[i].op.torus.r0,
+		op[i].op.torus.r1, step);
+      matrix_mult(peek(s), tmp);
+      draw_polygons(tmp, t, g);
       break;
     case LINE:
-      //*reference
-fgets(line, sizeof(line), f);
-      //printf("LINE\t%s", line);
-
-      sscanf(line, "%lf %lf %lf %lf %lf %lf",
-	     xvals, yvals, zvals,
-	     xvals+1, yvals+1, zvals+1);
-      //printf("%lf %lf %lf %lf %lf %lf",
-      //xvals[0], yvals[0], zvals[0],
-      //	     xvals[1], yvals[1], zvals[1]) 
-      //add_edge(edges, xvals[0], yvals[0], zvals[0],
-      //	       xvals[1], yvals[1], zvals[1]); 
-      line(xvals[0],yvals[0],zvals[0],xvals[1],yvals[1],zvals[1]);
-      //*/
+      add_edge(tmp, op[i].op.line.p0[0], op[i].op.line.p0[1],
+	      op[i].op.line.p0[2], op[i].op.line.p1[0],
+	      op[i].op.line.p1[1], op[i].op.line.p1[2]);
       break;
     case SAVE:
-      //*reference
-fgets(line, sizeof(line), f);
-      *strchr(line, '\n') = 0;
-      //printf("SAVE\t%s\n", line);
-      //save_extension(s, line);
-      save(line);
-      //*/
+      save_extension(t, op[i].op.save.p->name);
       break;
     case DISPLAY:
       display(t);
       break;
-
-      /*push: push a new origin matrix onto the origin stack
-  pop: remove the top matrix on the origin stack
-
-  move/scale/rotate: create a transformation matrix 
-                     based on the provided values, then 
-		     multiply the current top of the
-		     origins stack by it.
-
-  box/sphere/torus: create a solid object based on the
-                    provided values. Store that in a 
-		    temporary matrix, multiply it by the
-		    current top of the origins stack, then
-		    call draw_polygons.
-
-  line: create a line based on the provided values. Store 
-        that in a temporary matrix, multiply it by the
-	current top of the origins stack, then call draw_lines.
-
-  save: call save_extension with the provided filename
-
-  display: view the image live*/
     }
   }
 }
