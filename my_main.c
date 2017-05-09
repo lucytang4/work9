@@ -57,6 +57,7 @@ void my_main() {
   screen t;
   color g;
   double step = 0.01;
+  double theta;
   
   s = new_stack();
   tmp = new_matrix(4, 1000);
@@ -83,7 +84,7 @@ void my_main() {
       copy_matrix(tmp, peek(s));
       break;
     case ROTATE:
-      double theta = op[i].op.rotate.degrees * (M_PI / 180);
+      theta = op[i].op.rotate.degrees * (M_PI / 180);
       if (op[i].op.rotate.axis == 0 )
 	tmp = make_rotX( theta );
       else if (op[i].op.rotate.axis == 1)
@@ -107,7 +108,7 @@ void my_main() {
       draw_polygons(tmp, t, g);
       break;
     case TORUS:
-      add_torus(tmp, op[i].op.torus.d[0], op[i].op.toruse.d[1],
+      add_torus(tmp, op[i].op.torus.d[0], op[i].op.torus.d[1],
 		op[i].op.torus.d[2], op[i].op.torus.r0,
 		op[i].op.torus.r1, step);
       matrix_mult(peek(s), tmp);
