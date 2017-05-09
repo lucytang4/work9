@@ -76,12 +76,14 @@ void my_main() {
 			   op[i].op.move.d[2]);
       matrix_mult(peek(s), tmp);
       copy_matrix(tmp, peek(s));
+      tmp->lastcol = 0;
       break;
     case SCALE:
       tmp = make_scale(op[i].op.scale.d[0], op[i].op.scale.d[1],
 			   op[i].op.scale.d[2]);      
       matrix_mult(peek(s), tmp);
       copy_matrix(tmp, peek(s));
+      tmp->lastcol = 0;
       break;
     case ROTATE:
       theta = op[i].op.rotate.degrees * (M_PI / 180);
@@ -93,6 +95,7 @@ void my_main() {
 	tmp = make_rotZ( theta );
       matrix_mult(peek(s), tmp);
       copy_matrix(tmp, peek(s));
+      tmp->lastcol = 0;
       break;
     case BOX:
       add_box(tmp, op[i].op.box.d0[0], op[i].op.box.d0[1],
@@ -100,12 +103,14 @@ void my_main() {
 	      op[i].op.box.d1[1], op[i].op.box.d1[2]);
       matrix_mult(peek(s), tmp);
       draw_polygons(tmp, t, g);
+      tmp->lastcol = 0;
       break;
     case SPHERE:
       add_sphere(tmp, op[i].op.sphere.d[0], op[i].op.sphere.d[1],
 		 op[i].op.sphere.d[2], op[i].op.sphere.r, step);
       matrix_mult(peek(s), tmp);
       draw_polygons(tmp, t, g);
+      tmp->lastcol = 0;
       break;
     case TORUS:
       add_torus(tmp, op[i].op.torus.d[0], op[i].op.torus.d[1],
@@ -113,11 +118,13 @@ void my_main() {
 		op[i].op.torus.r1, step);
       matrix_mult(peek(s), tmp);
       draw_polygons(tmp, t, g);
+      tmp->lastcol = 0;
       break;
     case LINE:
       add_edge(tmp, op[i].op.line.p0[0], op[i].op.line.p0[1],
 	      op[i].op.line.p0[2], op[i].op.line.p1[0],
 	      op[i].op.line.p1[1], op[i].op.line.p1[2]);
+      tmp->lastcol = 0;
       break;
     case SAVE:
       save_extension(t, op[i].op.save.p->name);

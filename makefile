@@ -41,6 +41,9 @@ gmath.o: gmath.c gmath.h matrix.h
 stack.o: stack.c stack.h matrix.h
 	$(CC) $(CFLAGS) -c stack.c 
 
+run: all
+	./mdl script.mdl
+
 clean:
 	rm *.o *~
 	rm y.tab.c y.tab.h
